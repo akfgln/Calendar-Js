@@ -14,11 +14,11 @@ The `Calendar` class is a versatile JavaScript module that provides a full-featu
 
 ## Installation
 
-To use the `Calendar` class in your project, you need to include the JavaScript file (`complete_calendar.js`) in your HTML file, along with Bootstrap for modals and styling. The calendar is initialized in a container element that you specify by ID.
+To use the `Calendar` class in your project, you need to include the JavaScript file (`calendar.js`) in your HTML file, along with Bootstrap for modals and styling. The calendar is initialized in a container element that you specify by ID.
 
 ### Required Dependencies
 - [Bootstrap 5](https://getbootstrap.com/): For modal and UI components.
-- The `complete_calendar.js` JavaScript file.
+- The `calendar.js` JavaScript file.
 
 ### Example HTML Structure
 Create a container in your HTML where the calendar will be rendered.
@@ -37,7 +37,7 @@ Create a container in your HTML where the calendar will be rendered.
     <div id="calendarContainer" class="calendar-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="complete_calendar.js"></script>
+    <script src="calendar.js"></script>
     <script>
         // Initialize the calendar in Turkish (tr)
         const calendar = new Calendar('tr', 'calendarContainer');
