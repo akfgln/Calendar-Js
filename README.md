@@ -31,20 +31,20 @@ Ensure that you have a stable internet connection to load Bootstrap from the CDN
 
 1. **Navigation**: Use the `«` and `»` buttons to navigate between months.
 2. **Add Events**: Click on a day cell to add an event. A prompt will ask for the event details. For now, the events are hardcoded as birthday icons (`🎂`), but this can be modified to allow different types of events.
-3. **Language Switching**: To change the language, modify the `currentLanguage` variable in the JavaScript code (`script.js`). Supported values are `en`, `de`, and `tr`.
+3. **Language Switching**: To change the language, modify the `currentLanguage` variable in the JavaScript code (`calendar.js`). Supported values are `en`, `de`, and `tr`.
 4. **Date Range Highlighting**: Date ranges can be highlighted by updating the `dateRanges` array in the JavaScript code. Each date range is specified as `[start, end, color]` where `start` and `end` are dates in `YYYY-MM-DD` format.
 5. **Toast Notifications**: Special toast notifications will be displayed for specific events, such as birthdays.
 
 ## Code Overview
 
 - **HTML**: The `index.html` file defines the basic structure of the calendar, with Bootstrap classes for styling.
-- **CSS**: The `styles.css` file contains custom styles for the calendar. The Bootstrap framework is also used for styling.
-- **JavaScript**: The `script.js` file contains the core logic of the calendar, including event handling, date range highlighting, and multilingual support.
+- **CSS**: The `calendar.css` file contains custom styles for the calendar. The Bootstrap framework is also used for styling.
+- **JavaScript**: The `calendar.js` file contains the core logic of the calendar, including event handling, date range highlighting, and multilingual support.
 
 ## Customization
 
 - **Adding a New Language**:
-  - To add a new language, update the `languages` object in `script.js`.
+  - To add a new language, update the `languages` object in `calendar.js`.
   - Add the translations for month names, prompts, and messages.
   - Update the `currentLanguage` variable to use the new language.
 
