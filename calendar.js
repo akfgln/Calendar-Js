@@ -1,3 +1,4 @@
+
 class Calendar {
     constructor(language = 'en', containerId = 'calendarContainer') {
       this.languages = {
@@ -198,6 +199,26 @@ class Calendar {
         </div>
       `;
       document.body.appendChild(this.calendarDetailModal);
+  
+      // Save button click event
+      const saveEventBtn = this.calendarDetailModal.querySelector('#saveEventBtn');
+      saveEventBtn.addEventListener('click', () => {
+        const newEvent = this.getFormData();
+        const date = document.getElementById('eventStartDate').value;
+        if (!this.events[date]) {
+          this.events[date] = [];
+        }
+        const existingIndex = parseInt(document.getElementById('eventForm').dataset.index);
+        if (!isNaN(existingIndex)) {
+          this.events[date][existingIndex] = newEvent;
+        } else {
+          this.events[date].push(newEvent);
+        }
+        this.applyColorToDate(newEvent, date);
+        this.generateCalendar(this.currentYear, this.currentMonth);
+        const modalElement = bootstrap.Modal.getInstance(this.calendarDetailModal);
+        modalElement.hide();
+      });
     }
   
     showListModal(date) {
@@ -333,5 +354,6 @@ class Calendar {
     }
   }
   
-  // Takvimi oluşturma
+  // Initialize the Calendar
   const calendar = new Calendar('tr', 'calendarContainer');
+  
