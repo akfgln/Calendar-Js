@@ -1,172 +1,251 @@
-// Çoklu dil desteği için dil verisi
-const languages = {
-    en: {
-      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-      addEventPrompt: "Enter event:",
-      birthdayMessage: "Birthday celebration message",
-      viewDetail: "Detail",
-    },
-    de: {
-      months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-      addEventPrompt: "Ereignis eingeben:",
-      birthdayMessage: "Geburtstagsfeier Nachricht",
-      viewDetail: "Detail",
-    },
-    tr: {
-      months: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
-      addEventPrompt: "Event girin:",
-      birthdayMessage: "Doğum günü kutlama mesajı",
-      viewDetail: "Detay",
-    }
-  };
-  
-  let currentLanguage = 'tr'; // Varsayılan dil
-  
-  // Takvim verileri
-  let currentYear = 2024;
-  let currentMonth = 11; // 0: Ocak, 11: Aralık
-  let currentView = 'month'; // 'year', 'month', 'day' gibi görünümler.
-  
-  // Event ve tarih aralığı verilerini dışarıdan almak
-  let events = {};
-  let dateRanges = [];
-  
-  const calendarTitle = document.getElementById('calendarTitle');
-  const calendarGrid = document.getElementById('calendarGrid');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  
-  function generateCalendar(year, month) {
-    calendarGrid.innerHTML = '';
-    
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDayOfWeek = firstDay.getDay(); // 0: Pazar, 1: Pazartesi ...
-    
-    // Başlığa yıl-ay göster
-    const monthNames = languages[currentLanguage].months;
-    calendarTitle.textContent = `${year} ${monthNames[month]}`;
-    
-    // İlk haftadaki boş alanları doldur
-    for (let i = 0; i < startDayOfWeek; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.classList.add('calendar-day');
-      calendarGrid.appendChild(emptyCell);
-    }
-    
-    // Günleri oluştur
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-      const dayCell = document.createElement('div');
-      dayCell.classList.add('calendar-day');
-      dayCell.textContent = d;
-      dayCell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      
-      // Gün tıklama işlemi (Event ekleme)
-      dayCell.addEventListener('click', () => addEvent(dayCell.dataset.date));
-      
-      // Tarih stringi oluştur
-      const dateStr = dayCell.dataset.date;
-      
-      // Eğer event varsa göstermek
-      if (events[dateStr]) {
-        const eventInfo = events[dateStr];
-        const eventIndicator = document.createElement('div');
-        eventIndicator.classList.add('event-indicator');
-        
-        if (eventInfo.type === 'emoji') {
-          eventIndicator.textContent = eventInfo.icon;
-        } else if (eventInfo.type === 'dot') {
-          eventIndicator.classList.add('dot');
-          eventIndicator.style.background = eventInfo.color;
+class Calendar {
+    constructor(language = 'en', containerId = 'calendarContainer') {
+      this.languages = {
+        en: {
+          months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+          addEventPrompt: "Enter event:",
+          birthdayMessage: "Birthday celebration message",
+          viewDetail: "Detail",
+          eventDetails: "Event Details",
+          close: "Close",
+          eventTitle: "Event Title",
+          date: "Date",
+          startDate: "Start Date",
+          endDate: "End Date",
+          time: "Time",
+          icon: "Icon",
+          iconPlaceholder: "Enter emoji or symbol (e.g., 🎉)",
+          color: "Color",
+          delete: "Delete",
+          save: "Save"
+        },
+        de: {
+          months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+          addEventPrompt: "Ereignis eingeben:",
+          birthdayMessage: "Geburtstagsfeier Nachricht",
+          viewDetail: "Detail",
+          eventDetails: "Ereignisdetails",
+          close: "Schließen",
+          eventTitle: "Ereignistitel",
+          date: "Datum",
+          startDate: "Anfangsdatum",
+          endDate: "Enddatum",
+          time: "Uhrzeit",
+          icon: "Symbol",
+          iconPlaceholder: "Emoji oder Symbol eingeben (z.B., 🎉)",
+          color: "Farbe",
+          delete: "Löschen",
+          save: "Speichern"
+        },
+        tr: {
+          months: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+          addEventPrompt: "Event girin:",
+          birthdayMessage: "Doğum günü kutlama mesajı",
+          viewDetail: "Detay",
+          eventDetails: "Etkinlik Detayları",
+          close: "Kapat",
+          eventTitle: "Etkinlik Başlığı",
+          date: "Tarih",
+          startDate: "Başlangıç Tarihi",
+          endDate: "Bitiş Tarihi",
+          time: "Saat",
+          icon: "İkon",
+          iconPlaceholder: "Emoji veya simge girin (örn: 🎉)",
+          color: "Renk",
+          delete: "Sil",
+          save: "Kaydet"
         }
-        
-        dayCell.appendChild(eventIndicator);
-      }
-      
-      // Tarih aralıklarını renklendirme
-      dateRanges.forEach(([start, end, color]) => {
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        const currentDate = new Date(dateStr);
-        
-        if (currentDate >= startDate && currentDate <= endDate) {
-          dayCell.style.backgroundColor = color;
+      };
+      this.currentLanguage = language;
+      this.container = document.getElementById(containerId);
+      this.events = {};
+      this.currentYear = new Date().getFullYear();
+      this.currentMonth = new Date().getMonth();
+      this.init();
+    }
+  
+    init() {
+      this.renderCalendar();
+      this.initModal();
+      this.generateCalendar(this.currentYear, this.currentMonth);
+    }
+  
+    renderCalendar() {
+      this.container.innerHTML = `
+        <div class="calendar-header">
+          <div id="calendarTitle"></div>
+          <div class="calendar-controls">
+            <button id="prevBtn">«</button>
+            <button id="nextBtn">»</button>
+          </div>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+      `;
+      this.calendarTitle = this.container.querySelector('#calendarTitle');
+      this.calendarGrid = this.container.querySelector('#calendarGrid');
+      this.prevBtn = this.container.querySelector('#prevBtn');
+      this.nextBtn = this.container.querySelector('#nextBtn');
+  
+      this.prevBtn.addEventListener('click', () => {
+        this.currentMonth--;
+        if (this.currentMonth < 0) {
+          this.currentMonth = 11;
+          this.currentYear--;
         }
+        this.generateCalendar(this.currentYear, this.currentMonth);
       });
-      
-      // Örnek: Haftasonlarını renklendirme (Cumartesi:6, Pazar:0)
-      const dayOfWeek = new Date(year, month, d).getDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        dayCell.style.color = '#999';
+  
+      this.nextBtn.addEventListener('click', () => {
+        this.currentMonth++;
+        if (this.currentMonth > 11) {
+          this.currentMonth = 0;
+          this.currentYear++;
+        }
+        this.generateCalendar(this.currentYear, this.currentMonth);
+      });
+    }
+  
+    initModal() {
+      this.calendarModal = document.createElement('div');
+      this.calendarModal.classList.add('modal', 'fade');
+      this.calendarModal.id = 'calendarModal';
+      this.calendarModal.tabIndex = -1;
+      this.calendarModal.innerHTML = `
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel">${this.languages[this.currentLanguage].eventDetails}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${this.languages[this.currentLanguage].close}"></button>
+            </div>
+            <div class="modal-body">
+              <form id="eventForm">
+                <div class="mb-3">
+                  <label for="eventTitle" class="form-label">${this.languages[this.currentLanguage].eventTitle}</label>
+                  <input type="text" class="form-control" id="eventTitle" required>
+                </div>
+                <div class="mb-3">
+                  <label for="eventStartDate" class="form-label">${this.languages[this.currentLanguage].startDate}</label>
+                  <input type="date" class="form-control" id="eventStartDate" required>
+                </div>
+                <div class="mb-3">
+                  <label for="eventEndDate" class="form-label">${this.languages[this.currentLanguage].endDate}</label>
+                  <input type="date" class="form-control" id="eventEndDate">
+                </div>
+                <div class="mb-3">
+                  <label for="eventTime" class="form-label">${this.languages[this.currentLanguage].time}</label>
+                  <input type="time" class="form-control" id="eventTime">
+                </div>
+                <div class="mb-3">
+                  <label for="eventIcon" class="form-label">${this.languages[this.currentLanguage].icon}</label>
+                  <input type="text" class="form-control" id="eventIcon" placeholder="${this.languages[this.currentLanguage].iconPlaceholder}">
+                </div>
+                <div class="mb-3">
+                  <label for="eventColor" class="form-label">${this.languages[this.currentLanguage].color}</label>
+                  <input type="color" class="form-control" id="eventColor">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" id="deleteEventBtn">${this.languages[this.currentLanguage].delete}</button>
+              <button type="button" class="btn btn-primary" id="saveEventBtn">${this.languages[this.currentLanguage].save}</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(this.calendarModal);
+    }
+  
+    showEventModal(date, existingEvent = null) {
+      const eventTitle = document.getElementById('eventTitle');
+      const eventStartDate = document.getElementById('eventStartDate');
+      const eventEndDate = document.getElementById('eventEndDate');
+      const eventTime = document.getElementById('eventTime');
+      const eventIcon = document.getElementById('eventIcon');
+      const eventColor = document.getElementById('eventColor');
+      const deleteEventBtn = document.getElementById('deleteEventBtn');
+      const saveEventBtn = document.getElementById('saveEventBtn');
+  
+      eventStartDate.value = date;
+      eventEndDate.value = existingEvent ? existingEvent.endDate : '';
+      eventTitle.value = existingEvent ? existingEvent.title : '';
+      eventTime.value = existingEvent ? existingEvent.time : '';
+      eventIcon.value = existingEvent ? existingEvent.icon : '';
+      eventColor.value = existingEvent ? existingEvent.color : '#ff0000';
+  
+      deleteEventBtn.style.display = existingEvent ? 'inline-block' : 'none';
+  
+      deleteEventBtn.onclick = () => {
+        delete this.events[date];
+        this.generateCalendar(this.currentYear, this.currentMonth);
+        const modalElement = bootstrap.Modal.getInstance(this.calendarModal);
+        modalElement.hide();
+      };
+  
+      saveEventBtn.onclick = () => {
+        this.events[date] = {
+          title: eventTitle.value,
+          startDate: eventStartDate.value,
+          endDate: eventEndDate.value,
+          time: eventTime.value,
+          icon: eventIcon.value,
+          color: eventColor.value,
+          type: eventIcon.value ? 'emoji' : 'dot'
+        };
+        this.generateCalendar(this.currentYear, this.currentMonth);
+        const modalElement = bootstrap.Modal.getInstance(this.calendarModal);
+        modalElement.hide();
+      };
+  
+      const modal = new bootstrap.Modal(this.calendarModal);
+      modal.show();
+    }
+  
+    addOrEditEvent(date) {
+      const existingEvent = this.events[date] || null;
+      this.showEventModal(date, existingEvent);
+    }
+  
+    generateCalendar(year, month) {
+      this.calendarGrid.innerHTML = '';
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDayOfWeek = firstDay.getDay();
+      const monthNames = this.languages[this.currentLanguage].months;
+      this.calendarTitle.textContent = `${year} ${monthNames[month]}`;
+  
+      for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('calendar-day');
+        this.calendarGrid.appendChild(emptyCell);
       }
-      
-      calendarGrid.appendChild(dayCell);
-    }
-  }
   
-  // Görünüm değiştirme fonksiyonu (Basit Örnek)
-  function toggleView() {
-    if (currentView === 'month') {
-      currentView = 'year';
-      document.body.classList.add('view-year');
-      calendarTitle.textContent = currentYear.toString();
-    } else if (currentView === 'year') {
-      currentView = 'day';
-      document.body.classList.remove('view-year');
-      calendarTitle.textContent = `${currentYear}-12-05 ${languages[currentLanguage].viewDetail}`;
-    } else {
-      currentView = 'month';
-      generateCalendar(currentYear, currentMonth);
-      document.body.classList.remove('view-year');
-    }
-  }
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('calendar-day');
+        dayCell.textContent = d;
+        dayCell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   
-  function addEvent(date) {
-    // Event ekleme işlemi
-    const eventText = prompt(languages[currentLanguage].addEventPrompt);
-    if (eventText) {
-      // Event API'ye kaydedilebilir
-      events[date] = { type: 'emoji', icon: '🎂' }; // Örnek olarak doğum günü simgesi
-      generateCalendar(currentYear, currentMonth);
-      showToast(languages[currentLanguage].birthdayMessage, 10000);
-    }
-  }
+        const dateStr = dayCell.dataset.date;
+        dayCell.addEventListener('click', () => this.addOrEditEvent(dateStr));
   
-  function showToast(message, duration) {
-    const toast = document.createElement('div');
-    toast.classList.add('toast');
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.remove();
-    }, duration);
-  }
+        if (this.events[dateStr]) {
+          const eventInfo = this.events[dateStr];
+          const eventIndicator = document.createElement('div');
+          eventIndicator.classList.add('event-indicator');
+          if (eventInfo.type === 'emoji') {
+            eventIndicator.textContent = eventInfo.icon;
+          } else if (eventInfo.type === 'dot') {
+            eventIndicator.classList.add('dot');
+            eventIndicator.style.background = eventInfo.color;
+          }
+          dayCell.appendChild(eventIndicator);
+        }
   
-  calendarTitle.addEventListener('click', toggleView);
-  
-  // Önceki, sonraki butonlar
-  prevBtn.addEventListener('click', () => {
-    if (currentView === 'month') {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+        this.calendarGrid.appendChild(dayCell);
       }
-      generateCalendar(currentYear, currentMonth);
     }
-  });
+  }
   
-  nextBtn.addEventListener('click', () => {
-    if (currentView === 'month') {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      generateCalendar(currentYear, currentMonth);
-    }
-  });
+  // Takvimi oluşturma
+  const calendar = new Calendar('tr', 'calendarContainer');
   
-  // Başlangıçta takvimi yükle
-  generateCalendar(currentYear, currentMonth);
