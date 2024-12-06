@@ -1,4 +1,5 @@
 
+
 /* CSS (styles.css) */
 body {
     font-family: Arial, sans-serif;
@@ -54,6 +55,7 @@ body {
     font-size: 0.9rem;
     min-height: 80px;
     box-sizing: border-box;
+    cursor: pointer;
   }
   
   .calendar-day:nth-child(7n) {
@@ -82,5 +84,17 @@ body {
   .view-year .calendar-day {
     background: #fafafa;
     font-size: 0.7rem;
+  }
+  
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    opacity: 0.9;
+    z-index: 1000;
   }
   
