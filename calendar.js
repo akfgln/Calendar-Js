@@ -21,7 +21,8 @@ class Calendar {
           addNewEvent: "Add New Event",
           applyColor: "Apply color to days?",
           dot: "Dot",
-          full: "Full Box"
+          full: "Full Box",
+          eventList: "Event List"
         },
         de: {
           months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
@@ -43,7 +44,8 @@ class Calendar {
           addNewEvent: "Neues Ereignis hinzufügen",
           applyColor: "Farbe auf Tage anwenden?",
           dot: "Punkt",
-          full: "Voll Box"
+          full: "Voll Box",
+          eventList: "Ereignisliste"
         },
         tr: {
           months: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
@@ -65,7 +67,8 @@ class Calendar {
           addNewEvent: "Yeni Etkinlik Ekle",
           applyColor: "Renk günlere uygulansın mı?",
           dot: "Nokta",
-          full: "Tam Kutu"
+          full: "Tam Kutu",
+          eventList: "Etkinlik Listesi"
         }
       };
       this.currentLanguage = language;
@@ -78,7 +81,8 @@ class Calendar {
   
     init() {
       this.renderCalendar();
-      this.initModal();
+      this.initListModal();
+      this.initDetailModal();
       this.generateCalendar(this.currentYear, this.currentMonth);
     }
   
@@ -117,12 +121,34 @@ class Calendar {
       });
     }
   
-    initModal() {
-      this.calendarModal = document.createElement('div');
-      this.calendarModal.classList.add('modal', 'fade');
-      this.calendarModal.id = 'calendarModal';
-      this.calendarModal.tabIndex = -1;
-      this.calendarModal.innerHTML = `
+    initListModal() {
+      this.calendarListModal = document.createElement('div');
+      this.calendarListModal.classList.add('modal', 'fade');
+      this.calendarListModal.id = 'calendarListModal';
+      this.calendarListModal.tabIndex = -1;
+      this.calendarListModal.innerHTML = `
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel">${this.languages[this.currentLanguage].eventList}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${this.languages[this.currentLanguage].close}"></button>
+            </div>
+            <div class="modal-body">
+              <div id="eventList"></div>
+              <button type="button" class="btn btn-success" id="addNewEventBtn">${this.languages[this.currentLanguage].addNewEvent}</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(this.calendarListModal);
+    }
+  
+    initDetailModal() {
+      this.calendarDetailModal = document.createElement('div');
+      this.calendarDetailModal.classList.add('modal', 'fade');
+      this.calendarDetailModal.id = 'calendarDetailModal';
+      this.calendarDetailModal.tabIndex = -1;
+      this.calendarDetailModal.innerHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -130,7 +156,6 @@ class Calendar {
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${this.languages[this.currentLanguage].close}"></button>
             </div>
             <div class="modal-body">
-              <div id="eventList"></div>
               <form id="eventForm">
                 <div class="mb-3">
                   <label for="eventTitle" class="form-label">${this.languages[this.currentLanguage].eventTitle}</label>
@@ -168,25 +193,16 @@ class Calendar {
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" id="deleteEventBtn">${this.languages[this.currentLanguage].delete}</button>
               <button type="button" class="btn btn-primary" id="saveEventBtn">${this.languages[this.currentLanguage].save}</button>
-              <button type="button" class="btn btn-success" id="addNewEventBtn">${this.languages[this.currentLanguage].addNewEvent}</button>
             </div>
           </div>
         </div>
       `;
-      document.body.appendChild(this.calendarModal);
+      document.body.appendChild(this.calendarDetailModal);
     }
   
-    showEventModal(date) {
+    showListModal(date) {
       const eventList = document.getElementById('eventList');
-      const eventForm = document.getElementById('eventForm');
-      const eventStartDate = document.getElementById('eventStartDate');
       const addNewEventBtn = document.getElementById('addNewEventBtn');
-      const deleteEventBtn = document.getElementById('deleteEventBtn');
-      const saveEventBtn = document.getElementById('saveEventBtn');
-      const eventColor = document.getElementById('eventColor');
-      const applyColor = document.getElementById('applyColor');
-      
-      eventStartDate.value = date;
       eventList.innerHTML = '';
       const eventsOnDate = this.events[date] || [];
   
@@ -197,48 +213,35 @@ class Calendar {
           eventItem.textContent = `${event.title} (${event.startDate} - ${event.endDate})`;
           eventItem.onclick = () => {
             this.populateEventForm(event, date, index);
+            const detailModal = new bootstrap.Modal(this.calendarDetailModal);
+            detailModal.show();
           };
           eventList.appendChild(eventItem);
         });
       }
   
       addNewEventBtn.onclick = () => {
-        eventForm.reset();
-        deleteEventBtn.style.display = 'none';
+        this.populateEventForm({}, date, null);
+        const detailModal = new bootstrap.Modal(this.calendarDetailModal);
+        detailModal.show();
       };
   
-      saveEventBtn.onclick = () => {
-        const newEvent = this.getFormData();
-        if (!this.events[date]) {
-          this.events[date] = [];
-        }
-        const existingIndex = parseInt(eventForm.dataset.index);
-        if (!isNaN(existingIndex)) {
-          this.events[date][existingIndex] = newEvent;
-        } else {
-          this.events[date].push(newEvent);
-        }
-        this.applyColorToDate(newEvent, date);
-        this.generateCalendar(this.currentYear, this.currentMonth);
-        const modalElement = bootstrap.Modal.getInstance(this.calendarModal);
-        modalElement.hide();
-      };
+      const listModal = new bootstrap.Modal(this.calendarListModal);
+      listModal.show();
+    }
   
-      deleteEventBtn.onclick = () => {
-        const existingIndex = parseInt(eventForm.dataset.index);
-        if (!isNaN(existingIndex)) {
-          this.events[date].splice(existingIndex, 1);
-          if (this.events[date].length === 0) {
-            delete this.events[date];
-          }
-        }
-        this.generateCalendar(this.currentYear, this.currentMonth);
-        const modalElement = bootstrap.Modal.getInstance(this.calendarModal);
-        modalElement.hide();
-      };
+    populateEventForm(event, date, index) {
+      document.getElementById('eventTitle').value = event.title || '';
+      document.getElementById('eventStartDate').value = event.startDate || date;
+      document.getElementById('eventEndDate').value = event.endDate || '';
+      document.getElementById('eventTime').value = event.time || '';
+      document.getElementById('eventIcon').value = event.icon || '';
+      document.getElementById('eventColor').value = event.color || '#ff0000';
+      document.getElementById('applyColor').value = event.applyColor || 'dot';
   
-      const modal = new bootstrap.Modal(this.calendarModal);
-      modal.show();
+      const eventForm = document.getElementById('eventForm');
+      eventForm.dataset.index = index !== null ? index : '';
+      document.getElementById('deleteEventBtn').style.display = index !== null ? 'inline-block' : 'none';
     }
   
     getFormData() {
@@ -259,20 +262,6 @@ class Calendar {
         color: eventColor,
         applyColor: applyColor
       };
-    }
-  
-    populateEventForm(event, date, index) {
-      document.getElementById('eventTitle').value = event.title;
-      document.getElementById('eventStartDate').value = event.startDate;
-      document.getElementById('eventEndDate').value = event.endDate;
-      document.getElementById('eventTime').value = event.time;
-      document.getElementById('eventIcon').value = event.icon;
-      document.getElementById('eventColor').value = event.color;
-      document.getElementById('applyColor').value = event.applyColor;
-  
-      const eventForm = document.getElementById('eventForm');
-      eventForm.dataset.index = index;
-      document.getElementById('deleteEventBtn').style.display = 'inline-block';
     }
   
     applyColorToDate(event, date) {
@@ -315,7 +304,7 @@ class Calendar {
         dayCell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   
         const dateStr = dayCell.dataset.date;
-        dayCell.addEventListener('click', () => this.showEventModal(dateStr));
+        dayCell.addEventListener('click', () => this.showListModal(dateStr));
   
         if (this.events[dateStr]) {
           const eventInfo = this.events[dateStr][0];
@@ -323,6 +312,7 @@ class Calendar {
           eventIndicator.classList.add('event-indicator');
           if (eventInfo.applyColor === 'full') {
             dayCell.style.backgroundColor = eventInfo.color;
+            dayCell.style.color = this.getContrastColor(eventInfo.color);
           } else if (eventInfo.applyColor === 'dot') {
             eventIndicator.classList.add('dot');
             eventIndicator.style.background = eventInfo.color;
@@ -333,8 +323,15 @@ class Calendar {
         this.calendarGrid.appendChild(dayCell);
       }
     }
+  
+    getContrastColor(hexColor) {
+      const r = parseInt(hexColor.substr(1, 2), 16);
+      const g = parseInt(hexColor.substr(3, 2), 16);
+      const b = parseInt(hexColor.substr(5, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 125 ? 'black' : 'white';
+    }
   }
   
   // Takvimi oluşturma
   const calendar = new Calendar('tr', 'calendarContainer');
-  
