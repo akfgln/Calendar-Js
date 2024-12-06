@@ -1,83 +1,116 @@
-# Calendar Application
+# Calendar JavaScript Class
 
-This project is a multilingual calendar application built using JavaScript, HTML, CSS, and Bootstrap 5. It supports English, German, and Turkish languages, and is designed to be easily extendable to include additional languages. The calendar allows users to add events, edit existing events, highlight date ranges, and provides various calendar views (monthly, yearly, etc.).
+The `Calendar` class is a versatile JavaScript module that provides a full-featured calendar interface with support for creating, modifying, and deleting events. It includes multilingual support for English (`en`), German (`de`), and Turkish (`tr`). The events can have customizable colors, icons, and time ranges, with the ability to apply those colors as full backgrounds or dots on the calendar dates.
 
 ## Features
 
-- **Multilingual Support**: Currently supports English, German, and Turkish. Additional languages can be easily added by updating the `languages` object in the JavaScript code.
-- **Dynamic Calendar Generation**: The calendar is generated dynamically based on the selected year and month, showing day cells with events and highlighted date ranges.
-- **Event Management**: Users can add, edit, and delete events. Clicking on a day opens a modal that displays existing events and allows users to create new events or modify existing ones.
-  - **Event Details**: Users can add icons, select custom colors, set times, and modify existing events.
-  - **Date Change**: Events can be moved to a different day, and the old entry will be updated accordingly.
-- **Date Range Highlighting**: Specific date ranges can be highlighted with custom colors, making it easy to visually distinguish important periods.
-- **Interactive Views**: The calendar supports different views, including month, year, and day details.
-- **Toast Notifications**: When adding a birthday event, a toast notification is displayed to celebrate the event.
+- **Multilingual Support**: Currently supports English (`en`), German (`de`), and Turkish (`tr`).
+- **Event Creation and Management**: Allows users to create, view, update, and delete events.
+- **Modal for Events**: Includes two modals for event management:
+  - **List Modal**: Lists all events for a selected day with an option to add new events.
+  - **Detail Modal**: Displays details of an existing event and allows editing or deleting.
+- **Customizable Event Appearance**: Events can have custom colors, icons, and time details.
+- **UI Controls**: Provides navigation buttons to switch between months.
 
 ## Installation
 
-To use this project, simply clone the repository and open the `index.html` file in your browser.
+To use the `Calendar` class in your project, you need to include the JavaScript file (`complete_calendar.js`) in your HTML file, along with Bootstrap for modals and styling. The calendar is initialized in a container element that you specify by ID.
 
-```sh
-# Clone the repository
-git clone https://github.com/akfgln/Calendar-Js.git
+### Required Dependencies
+- [Bootstrap 5](https://getbootstrap.com/): For modal and UI components.
+- The `complete_calendar.js` JavaScript file.
 
-# Navigate to the project directory
-cd calendar-project
+### Example HTML Structure
+Create a container in your HTML where the calendar will be rendered.
 
-# Open the index.html in your preferred browser
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="calendar.css">
+</head>
+<body>
+    <div id="calendarContainer" class="calendar-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="complete_calendar.js"></script>
+    <script>
+        // Initialize the calendar in Turkish (tr)
+        const calendar = new Calendar('tr', 'calendarContainer');
+    </script>
+</body>
+</html>
 ```
 
-Ensure that you have a stable internet connection to load Bootstrap from the CDN.
+## Usage
 
-## How to Use
+### Creating a New Calendar
+To create a new calendar instance, use the following JavaScript code:
 
-1. **Navigation**: Use the `«` and `»` buttons to navigate between months.
-2. **Add Events**: Click on a day cell to add or edit an event. A modal will open, displaying the existing events for that day. You can add new events or edit existing ones, including changing the date, time, icon, and color.
-3. **Language Switching**: To change the language, modify the `currentLanguage` variable in the JavaScript code (`calendar.js`). Supported values are `en`, `de`, and `tr`.
-4. **Date Range Highlighting**: Date ranges can be highlighted by updating the `dateRanges` array in the JavaScript code. Each date range is specified as `[start, end, color]` where `start` and `end` are dates in `YYYY-MM-DD` format.
-5. **Toast Notifications**: Special toast notifications will be displayed for specific events, such as birthdays.
+```javascript
+const calendar = new Calendar('en', 'calendarContainer');
+```
 
-## Code Overview
+- The first parameter is the language code (`'en'`, `'de'`, `'tr'`).
+- The second parameter is the ID of the container where the calendar will be rendered.
 
-- **HTML**: The `index.html` file defines the basic structure of the calendar, with Bootstrap classes for styling.
-- **CSS**: The `calendar.css` file contains custom styles for the calendar. The Bootstrap framework is also used for styling.
-- **JavaScript**: The `calendar.js` file contains the core logic of the calendar, including event handling, date range highlighting, multilingual support, and modal management for event details.
+### Event Management
+The calendar allows you to manage events through modals.
 
-## Customization
+1. **Click on a Day**: Clicking on a day in the calendar opens the **List Modal**, showing all events for that day.
+2. **Add a New Event**: In the **List Modal**, click on "Add New Event" to open the **Detail Modal** where you can enter event details, including:
+   - **Title**: The title of the event.
+   - **Start and End Dates**: The range of dates for the event.
+   - **Time**: The time of the event.
+   - **Icon**: Any emoji or symbol to visually represent the event.
+   - **Color**: Choose a color to represent the event in the calendar.
+   - **Apply Color**: Select whether the color should appear as a "dot" or as a "full box" on the calendar date.
+3. **Edit an Event**: Click on an existing event in the **List Modal** to open the **Detail Modal** with event details, where you can edit or delete the event.
+4. **Delete an Event**: Use the delete button in the **Detail Modal** to remove an event.
 
-- **Adding a New Language**:
-  - To add a new language, update the `languages` object in `calendar.js`.
-  - Add the translations for month names, prompts, and messages.
-  - Update the `currentLanguage` variable to use the new language.
+### Customization
+The calendar supports the following customizations:
 
-- **Backend Integration**:
-  - The current implementation uses a modal to gather event details. To integrate with a backend API, modify the event functions to make API calls to save, update, or delete event data.
+- **Language Selection**: Pass a language code to the constructor to set the calendar's language.
+- **Event Colors and Icons**: Customize each event with a color and icon of your choice.
+- **Full Date or Dot Color Indication**: You can apply a color to an entire date box or add a colored dot to indicate an event.
 
-- **Event Customization**:
-  - The current event indicators are either emojis or colored dots. You can customize these indicators by changing the `events` object or by updating the event modal to allow users to select different types of indicators.
+### Example Walkthrough
+Suppose you want to create a birthday event for a friend:
 
-## Dependencies
+1. Click on the desired date in the calendar.
+2. Click on "Add New Event" in the **List Modal**.
+3. Fill in the details:
+   - Title: "John's Birthday"
+   - Start Date: Select the friend's birthday.
+   - Time: Set the time for the celebration.
+   - Icon: 🎂 (cake emoji)
+   - Color: Choose a color that will highlight this event in the calendar.
+   - Apply Color: Choose "full box" to make the day stand out.
+4. Click **Save** to add the event.
 
-- **Bootstrap 5**: The application uses Bootstrap 5 for styling and responsiveness.
-- **JavaScript**: Vanilla JavaScript is used for all dynamic behavior.
+When John's birthday arrives, the day will be highlighted with the chosen color and display the cake emoji, giving a visual reminder.
 
-## Future Improvements
+## Methods
 
-- **Full Backend Integration**: Connect the application to a backend API to persist events and date ranges.
-- **User Authentication**: Add authentication to allow different users to have their own calendars.
-- **Drag and Drop Events**: Implement drag-and-drop functionality for moving events between dates.
-- **Additional Views**: Include weekly views and a more detailed daily agenda view.
-- **Event Recurrence**: Add support for recurring events, such as weekly meetings or yearly anniversaries.
+- **Constructor**: `new Calendar(language, containerId)`
+  - `language` (string): The language of the calendar (`en`, `de`, `tr`).
+  - `containerId` (string): The ID of the container where the calendar should be rendered.
+- **Event Modals**: The **List Modal** and **Detail Modal** help manage events visually.
+
+## Styling
+To change the calendar's appearance, modify the `calendar.css` file, which is included in the example HTML. You can adjust the look and feel of the calendar to better suit your application's theme.
 
 ## License
+This project is open-source and available under the MIT License.
 
-This project is licensed under the MIT License. Feel free to use, modify, and distribute it as you see fit.
+## Contributing
+Contributions are welcome! Feel free to open an issue or submit a pull request with any improvements or additional features.
 
-## Contributions
-
-Contributions are welcome! If you'd like to improve the project or add new features, feel free to open a pull request or submit an issue.
-
-## Contact
-
-If you have any questions or suggestions, please contact us at [akfgln@gmail.com].
+## Conclusion
+The `Calendar` JavaScript class is a flexible and feature-rich way to add a calendar to your website or application, complete with event management, multilingual support, and customizable appearance. Whether you need a simple calendar or an interactive scheduler, this class can be easily integrated and adapted to suit your needs.
 
