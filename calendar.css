@@ -1,52 +1,34 @@
-
-
-/* CSS (styles.css) */
 body {
     font-family: Arial, sans-serif;
     background: #f7f7f7;
     margin: 0;
     padding: 20px;
-  }
-  
-  .calendar-container {
-    max-width: 600px;
+}
+
+.calendar-container {
+    max-width: 800px;
     margin: 0 auto;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
-  }
-  
-  .calendar-header {
+    padding: 20px;
+}
+
+.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-  }
-  
-  .calendar-title {
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
-  
-  .calendar-controls button {
-    background: none;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .calendar-controls button:hover {
-    background: #eee;
-  }
-  
-  .calendar-grid {
+    margin-bottom: 20px;
+}
+
+.calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
     border-top: 1px solid #ccc;
-  }
-  
-  .calendar-day {
+}
+
+.calendar-day {
     padding: 20px;
     border-bottom: 1px solid #eee;
     border-right: 1px solid #eee;
@@ -56,45 +38,29 @@ body {
     min-height: 80px;
     box-sizing: border-box;
     cursor: pointer;
-  }
-  
-  .calendar-day:nth-child(7n) {
+    background: #fff;
+}
+
+.calendar-day:nth-child(7n) {
     border-right: none;
-  }
-  
-  .calendar-day.highlighted {
-    background: #f0f8ff;
-  }
-  
-  .calendar-day .event-indicator {
+}
+
+.calendar-day .event-indicator {
     position: absolute;
     bottom: 5px;
     left: 5px;
     font-size: 0.8rem;
-  }
-  
-  .calendar-day .event-indicator.dot {
+}
+
+.calendar-day .event-indicator.dot {
     width: 8px;
     height: 8px;
     background: red;
     border-radius: 50%;
     display: inline-block;
-  }
-  
-  .view-year .calendar-day {
-    background: #fafafa;
-    font-size: 0.7rem;
-  }
-  
-  .toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    opacity: 0.9;
-    z-index: 1000;
-  }
-  
+}
+
+.modal-content {
+    background-color: #f7f7f7;
+    border-radius: 6px;
+}
