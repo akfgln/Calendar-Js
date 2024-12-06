@@ -17,7 +17,7 @@ To use this project, simply clone the repository and open the `index.html` file 
 
 ```sh
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/akfgln/Calendar-Js.git
 
 # Navigate to the project directory
 cd calendar-project
@@ -76,5 +76,5 @@ Contributions are welcome! If you'd like to improve the project or add new featu
 
 ## Contact
 
-If you have any questions or suggestions, please contact us at [your-email@example.com].
+If you have any questions or suggestions, please contact us at [akfgln@gmail.com].
 
